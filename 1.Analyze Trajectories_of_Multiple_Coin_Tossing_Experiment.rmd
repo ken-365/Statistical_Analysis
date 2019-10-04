@@ -1,0 +1,99 @@
+---
+title: "Analyze Trajectories of Multiple Coin Tossing Experiment"
+author: "PK (Kasidit) Ratanavijai"
+date: "9/26/2019"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+# 1. Convergence of probability of tail to 0.5
+Check that frequency of “Tails” (outcome equals 1) converges to 0.5 as the number of tosses grows  
+
+**Interpret what you see on the graphs.**   
+First plot is cumulative trajectory for 100,000 flips abd second plot is cumulative trajectory for 4,000 flips  
+we can see that the more flips we simulated the more Frequency or tail aproach 0.5 from the first plot 100,000   flips give us clear picture of the trajectory almost match the x axis which is 0.5.  
+
+
+```{r echo=FALSE}
+set.seed(12345)
+nFlips = 100000
+Flips<-sample(0:1,nFlips,repl=T)
+Trajectory<-cumsum(Flips) 
+freq<-Trajectory/(1:nFlips)
+plot(1:length(freq),freq, ylim=c(.4,1),type="l",ylab="Frequency",xlab="Sample Length")
+lines(c(0,nFlips),c(.5,.5))
+plot(1:4000,freq[1:4000], ylim=c(.4,1),type="l",ylab="Frequency",xlab="Sample Length") 
+lines(c(0,4000),c(.5,.5))
+
+```
+
+
+  
+# 2. Check your intuition about random walks  
+## 2.1 One trajectory  
+  
+```{r echo=FALSE}
+nFlips<-1000000;
+set.seed(12345)
+Flips<-(sample(0:1,nFlips,repl=T)-.5)*2
+oneTrajectory<-cumsum(Flips)
+plot(oneTrajectory, ylim=c(-1000,1000),type="l")
+lines(c(0,nFlips),c(0,0))
+
+```
+
+
+**Check your intuition by answering questions before calculation:**  
+* How much do you expect the trajectory of wealth to deviate from zero  
+less than 10%  
+* How long do you expect it to stay on one side above or below zero?  
+less than 30%  
+  
+Comment out the set.seed() line and repeat the experiment multiple times.  
+
+**How do the observations match your prior expectations?**  
+The trajectory vary greatly in each experiment. Some are close to 0 line some are huge far off the line.  
+
+## 2.2. Multiple trajectories  
+  
+**What do you expect the probabilities of the following events to be?**
+Probability of = N.h - N.t less than 5 will be less than 10%  
+Probability of = N.h - N.t more than 25 will be less than 20%  
+  
+
+
+```{r}
+nFlips<-2000
+Trajectories2000by500<-t(apply(matrix(Flips,ncol=500),1,cumsum))
+dim(Trajectories2000by500)
+
+(probability.less.than.5<-sum(abs(Trajectories2000by500[,500])<5)/2000)
+ 
+(probability.greater.than.25 <- sum(abs(Trajectories2000by500[,500])>=25)/2000)
+
+```
+  
+**Interpret the results. How did they correspond to your intuition?**  
+The result coresspond to my answer. Its is higher probability for trajectory to vary more  
+
+## 2.3 Time on one side  
+**How long do you expect trajectory of random walk to spend on one side from zero, below or above? (Answer before doing calculations)**  
+It could be more than 50% of the trajectory itself but the number could be vary randomly from 1% to 100%  
+
+```{r}
+timeAbove<-apply(Trajectories2000by500,1,function(z) sum(z>0))
+hist(timeAbove)
+
+```
+  
+**Interpret the results. Was your intuition correct?**  
+The result is time spend on positive side is almost 2000
+
+**Explain the observed distribution.**  
+there are two peaks in over 0-50 and 450-500  
+
+**Search for the name of the law that we are observing on the last histogram.**  
+bimodal distribution  
+
